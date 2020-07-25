@@ -32,14 +32,18 @@ class BarcodeScannerStreamHandler(): EventChannel.StreamHandler {
 
 /** FlutterSunmiBacodeScannerPlugin */
 public class FlutterSunmiBacodeScannerPlugin: FlutterPlugin, MethodCallHandler {
-//  private var scanInterface: IScanInterface?  = null
-//  private val streamHandler = BarcodeScannerStreamHandler()
-//  private val BARCODE_SCANNER_EVENT_CHANNEL = "flutter_sunmi_bacode_scanner/scanner_result"
-  private val METHOD_CHANNEL = "flutter_sunmi_bacode_scanner/scanner"
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), METHOD_CHANNEL)
-    channel.setMethodCallHandler(FlutterSunmiBacodeScannerPlugin());
+    val channel = MethodChannel(flutterPluginBinding.binaryMessenger, METHOD_CHANNEL)
+    channel.setMethodCallHandler(FlutterSunmiBacodeScannerPlugin())
+
+    val intent = Intent()
+    intent.setPackage("com.sunmi.scanner")
+    intent.action = "com.sunmi.scanner.IScanInterface"
+    flutterPluginBinding.applicationContext.bindService(intent, scanner, Service.BIND_AUTO_CREATE)
+
+    EventChannel(flutterPluginBinding.binaryMessenger, BARCODE_SCANNER_EVENT_CHANNEL).setStreamHandler(streamHandler)
+    flutterPluginBinding.applicationContext.registerReceiver(BarcodeScannerReceiver(streamHandler), IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"))
   }
 
   // This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -52,11 +56,7 @@ public class FlutterSunmiBacodeScannerPlugin: FlutterPlugin, MethodCallHandler {
   // depending on the user's project. onAttachedToEngine or registerWith must both be defined
   // in the same class.
   companion object {
-    private val BARCODE_SCANNER_EVENT_CHANNEL = "flutter_sunmi_bacode_scanner/scanner_result"
-    private val METHOD_CHANNEL = "flutter_sunmi_bacode_scanner/scanner"
     private var scanInterface: IScanInterface?  = null
-    private val streamHandler = BarcodeScannerStreamHandler()
-
     private val scanner = object : ServiceConnection {
       override fun onServiceConnected(name: ComponentName, service: IBinder) {
         scanInterface = IScanInterface.Stub.asInterface(service)
@@ -68,6 +68,10 @@ public class FlutterSunmiBacodeScannerPlugin: FlutterPlugin, MethodCallHandler {
         scanInterface = null
       }
     }
+
+    private val BARCODE_SCANNER_EVENT_CHANNEL = "flutter_sunmi_bacode_scanner/scanner_result"
+    private val METHOD_CHANNEL = "flutter_sunmi_bacode_scanner/scanner"
+    private val streamHandler = BarcodeScannerStreamHandler()
 
     @JvmStatic
     fun registerWith(registrar: Registrar) {
@@ -87,7 +91,7 @@ public class FlutterSunmiBacodeScannerPlugin: FlutterPlugin, MethodCallHandler {
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when (call.method) {
       "scanBarcode" -> {
-        scanInterface?.scan();
+        scanInterface?.scan()
         result.success(null)
       }
 
