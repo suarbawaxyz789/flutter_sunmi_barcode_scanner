@@ -81,10 +81,10 @@ public class FlutterSunmiBacodeScannerPlugin: FlutterPlugin, MethodCallHandler {
       val intent = Intent()
       intent.setPackage("com.sunmi.scanner")
       intent.action = "com.sunmi.scanner.IScanInterface"
-      registrar.activity().applicationContext.bindService(intent, scanner, Service.BIND_AUTO_CREATE)
+      registrar.activity()?.applicationContext?.bindService(intent, scanner, Service.BIND_AUTO_CREATE)
 
       EventChannel(registrar.messenger(), BARCODE_SCANNER_EVENT_CHANNEL).setStreamHandler(streamHandler)
-      registrar.activity().registerReceiver(BarcodeScannerReceiver(streamHandler), IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"))
+      registrar.activity()?.registerReceiver(BarcodeScannerReceiver(streamHandler), IntentFilter("com.sunmi.scanner.ACTION_DATA_CODE_RECEIVED"))
     }
   }
 

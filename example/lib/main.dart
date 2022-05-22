@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await FlutterSunmiBacodeScanner.platformVersion;
+      // platformVersion = await FlutterSunmiBacodeScanner.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
