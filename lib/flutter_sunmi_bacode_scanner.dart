@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class FlutterSunmiBacodeScanner {
-  MethodChannel _platform;
-  EventChannel _eventChannel;
+  late MethodChannel _platform;
+  late EventChannel _eventChannel;
 
   FlutterSunmiBacodeScanner() {
     _platform = const MethodChannel('flutter_sunmi_bacode_scanner/scanner');
@@ -16,13 +16,13 @@ class FlutterSunmiBacodeScanner {
 //    return version;
 //  }
 
-  Future<bool> hasBarcodeScanner() async{
+  Future<bool?> hasBarcodeScanner() async{
     return await _platform.invokeMethod('hasBarcodeScanner');
   }
 
-  Stream<Object> scanBarcode() async* {
+  Stream<Object?> scanBarcode() async* {
     yield await _platform.invokeMethod('scanBarcode');
 
-    yield* _eventChannel.receiveBroadcastStream();
+    yield* _eventChannel.receiveBroadcastStream() as Stream<Object>;
   }
 }
