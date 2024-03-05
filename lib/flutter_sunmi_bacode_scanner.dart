@@ -23,6 +23,6 @@ class FlutterSunmiBacodeScanner {
   Stream<Object?> scanBarcode() async* {
     yield await _platform.invokeMethod('scanBarcode');
 
-    yield* _eventChannel.receiveBroadcastStream() as Stream<Object>;
+    yield* _eventChannel.receiveBroadcastStream();
   }
 }
